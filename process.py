@@ -49,29 +49,30 @@ class IOStatReport(object):
         self.fd.readline()
 
     def read_header(self, lines):
-        keys = lines[0].split()[1:]
-        values = lines[1].split()
+        time = lines[0].split()
+        keys = lines[1].split()[1:]
+        values = lines[2].split()
 
         header_data = dict(zip(keys, values))
+        header_data[time[0]] = "".join(time[1:])
 
         data = {}
-        data['headers'] = header_data
+        data['data'] = header_data
         self.run.append(data)
 
     def read_data(self, lines):
+        timeslice = self.run[-1]['data']
         keys = lines[0].split()[1:]
 
         for line in lines[1:]:
             data = line.split()
-#            print line
-
-        self.run[-1]['data'] = keys
+            timeslice[data[0]] = dict(zip(keys, data[1:]))
 
     def print_data(self):
         print self.system
         for run in self.run:
             pprint(run)
-            print '\n\n\n\n\n'
+            print
 
 if __name__ == "__main__":
     stats = IOStatReport(sys.argv[1])
