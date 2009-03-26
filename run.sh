@@ -45,7 +45,7 @@ run_all_tests()
   x=0;
   while [ $x != ${#flags[@]} ]
   do
-    mkdir ${dir[$x]}
+    mkdir -p $OUTPUT_DIR/${dir[$x]}
     iostat -k -t $REPORT_TIME > $OUTPUT_DIR/${dir[$x]}/ioreport &
     vmstat -a -n -S k $REPORT_TIME > $OUTPUT_DIR/${dir[$x]}/vmreport &
     mpstat -P ALL $REPORT_TIME > $OUTPUT_DIR/${dir[$x]}/mpreport &
