@@ -155,23 +155,3 @@ class VMStatReport(object):
             pprint(run)
             print
 
-
-if __name__ == "__main__":
-    iostats = IOStatReport(sys.argv[1] + "ioreport")
-    mpstats = MPStatReport(sys.argv[1] + "mpreport")
-    vmstats = VMStatReport(sys.argv[1] + "vmreport")
-
-    print "IOStats:"
-    for stat in iostats.run[1:]:
-      pprint(stat['sda']['tps'])
-    print
-
-    print "MPStats:"
-    for stat in mpstats.run[1:]:
-      pprint(stat['all']['intr/s'])
-    print
-
-    print "VMStats:"
-    for stat in vmstats.run[1:]:
-      pprint(stat['memory']['active'])
-
