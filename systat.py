@@ -108,12 +108,22 @@ class MPStatReport(object):
         timeslice = {}
         line = lines[0].split()
 
-        time = line[:1]
-        keys = line[3:]
+        if line[1] == "AM" or line[1] == "PM":
+            time = line[:1]
+            keys = line[3:]
+            for lin in lines[1:]:
+                data = lin.split()
+                timeslice[data[2]] = dict(zip(keys, data[3:]))
+        else:
+            time = line[0]
+            keys = line[2:]
+            for lin in lines[1:]:
+                data = lin.split()
+                timeslice[data[1]] = dict(zip(keys, data[2:]))
 
-        for lin in lines[1:]:
-            data = lin.split()
-            timeslice[data[2]] = dict(zip(keys, data[3:]))
+        for key in timeslice:
+            for item in timeslice[key]:
+                timeslice[key][item] = timeslice[key][item].replace(',', '.')
 
         timeslice["Time"] = "".join(time)
 
@@ -154,4 +164,53 @@ class VMStatReport(object):
         for run in self.run:
             pprint(run)
             print
+
+
+class PIDStatReport(object):
+    def __init__(self, filename):
+        self.fd = open(filename, 'r')
+        self.run = []
+
+        self.read_system_info()
+
+        data_buffer = []
+
+        line = self.fd.readline()
+        while line:
+            if line == '\n':
+                self.read_data(data_buffer)
+                data_buffer = []
+            else:
+                data_buffer.append(line)
+            line = self.fd.readline()
+
+    def read_system_info(self):
+        line = self.fd.readline()[:-1]
+        data = line.split()
+
+        system = {}
+        system['kernel'] = data[0]
+        system['version'] = data[1]
+        system['hostname'] = data[2][1:-1]
+        system['date'] = data[3]
+
+        self.system = system
+        self.fd.readline()
+
+    def read_data(self, lines):
+        keys = lines[0][:-1].split()
+        data = lines[-1][:-1].split()
+
+        ts = dict(zip(keys[2:-1], data[2:-1]))
+        ts['Time'] = keys[0]
+        for key in ts:
+            ts[key] = ts[key].replace(',', '.')
+        self.run.append(ts)
+
+    def print_data(self):
+        print self.system
+        for run in self.run:
+            pprint(run)
+            print
+
 
