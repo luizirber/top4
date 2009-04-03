@@ -18,6 +18,8 @@ def plot_data(basedir):
             vmstats = VMStatReport(os.path.join(subdir, "vmreport"))
             pidstats = PIDStatReport(os.path.join(subdir, "pidreport"))
 
+            data_stats = open(os.path.join(subdir, 'estatistica'), 'w')
+
             time = arange(0, 70, 5, dtype="float_")
 
             g = Gnuplot.Gnuplot()
@@ -26,6 +28,7 @@ def plot_data(basedir):
             g('set multiplot')
 
             # CPU Utilization
+            data_stats.write("CPU Utilization\n" + "*"*60 + "\n")
             g.title = "CPU Utilization"
             g.xlabel('time (s)')
             g.ylabel('% of CPU time')
@@ -39,12 +42,18 @@ def plot_data(basedir):
                                     title="non-kernel code",
                                     using="($0*5):1",
                                     smooth=1)
+            data_stats.write("non-kernel code media: %.2f\n" % data.mean())
+            data_stats.write("non-kernel code desvio: %.2f\n" % data.std())
+            data_stats.write("non-kernel code histograma: %s\n\n" % [histogram(data)])
 
             data = array([float(i['all']['%sys']) for i in mpstats.run[1:]],
                          dtype="float_")
             sysdata = Gnuplot.Data(data,
                                    title="kernel code",
                                    using="($0*5):1")
+            data_stats.write("kernel code media: %.2f\n" % data.mean())
+            data_stats.write("kernel code desvio: %.2f\n" % data.std())
+            data_stats.write("kernel code histograma: %s\n\n" % [histogram(data)])
 
             data = array([float(i['all']['%idle']) for i in mpstats.run[1:]],
                          dtype="float_")
@@ -52,6 +61,9 @@ def plot_data(basedir):
                                     title="idle",
                                     using="($0*5):1",
                                     smooth=1)
+            data_stats.write("idle media: %.2f\n" % data.mean())
+            data_stats.write("idle desvio: %.2f\n" % data.std())
+            data_stats.write("idle histograma: %s\n\n" % [histogram(data)])
 
             data = array([float(i['all']['%iowait']) for i in mpstats.run[1:]],
                          dtype="float_")
@@ -59,10 +71,14 @@ def plot_data(basedir):
                                   title="waiting IO",
                                   using="($0*5):1",
                                   smooth=1)
+            data_stats.write("waiting IO media: %.2f\n" % data.mean())
+            data_stats.write("waiting IO desvio: %.2f\n" % data.std())
+            data_stats.write("waiting IO histograma: %s\n\n" % [histogram(data)])
 
             g.plot(userdata, sysdata, idledata, iodata)
 
             # IO utilization
+            data_stats.write("IO Utilization\n" + "*"*60 + "\n")
             g.title = "IO Utilization"
             g.xlabel('time (s)')
             g.ylabel('Memory Fluctuation (kbytes/sec)')
@@ -74,12 +90,18 @@ def plot_data(basedir):
                                     title="memory swapped in from disk",
                                     using="($0*5):1",
                                     smooth=1)
+            data_stats.write("memory swapped in from disk media: %.2f\n" % data.mean())
+            data_stats.write("memory swapped in from disk desvio: %.2f\n" % data.std())
+            data_stats.write("memory swapped in from disk histograma: %s\n\n" % [histogram(data)])
 
             data = array([float(i['swap']['so']) for i in vmstats.run[1:]],
                          dtype="float_")
             memoutdata = Gnuplot.Data(data,
                                       title="memory swapped to disk",
                                       using="($0*5):1")
+            data_stats.write("memory swapped to disk media: %.2f\n" % data.mean())
+            data_stats.write("memory swapped to disk desvio: %.2f\n" % data.std())
+            data_stats.write("memory swapped to disk histograma: %s\n\n" % [histogram(data)])
 
             data = array([float(i['io']['bi']) for i in vmstats.run[1:]],
                          dtype="float_")
@@ -87,6 +109,9 @@ def plot_data(basedir):
                                    title="blocks received from a block device",
                                    using="($0*5):1",
                                    smooth=1)
+            data_stats.write("blocks received from a block device media: %.2f\n" % data.mean())
+            data_stats.write("blocks received from a block device desvio: %.2f\n" % data.std())
+            data_stats.write("blocks received from a block device histograma: %s\n\n" % [histogram(data)])
 
             data = array([float(i['io']['bo']) for i in vmstats.run[1:]],
                          dtype="float_")
@@ -94,10 +119,14 @@ def plot_data(basedir):
                                     title="blocks sent to a block device",
                                     using="($0*5):1",
                                     smooth=1)
+            data_stats.write("blocks sent to a block device media: %.2f\n" % data.mean())
+            data_stats.write("blocks sent to a block device desvio: %.2f\n" % data.std())
+            data_stats.write("blocks sent to a block device histograma: %s\n\n" % [histogram(data)])
 
             g.plot(memindata, memoutdata, bindata, boutdata)
 
             # Mem utilization
+            data_stats.write("Mem Utilization\n" + "*"*60 + "\n")
             g.title = "Mem Utilization"
             g.xlabel('time (s)')
             g.ylabel('Memory Used (bytes)')
@@ -110,12 +139,18 @@ def plot_data(basedir):
                                     title="virtual memory",
                                     using="($0*5):1",
                                     smooth=1)
+            data_stats.write("virtual memory media: %.2f\n" % data.mean())
+            data_stats.write("virtual memory desvio: %.2f\n" % data.std())
+            data_stats.write("virtual memory histograma: %s\n\n" % [histogram(data)])
 
             data = array([float(i['memory']['free']) for i in vmstats.run[1:]],
                          dtype="float_")
             sysdata = Gnuplot.Data(data,
                                    title="idle memory",
                                    using="($0*5):1")
+            data_stats.write("idle memory media: %.2f\n" % data.mean())
+            data_stats.write("idle memory desvio: %.2f\n" % data.std())
+            data_stats.write("idle memory histograma: %s\n\n" % [histogram(data)])
 
             data = array([float(i['memory']['inact']) for i in vmstats.run[1:]],
                          dtype="float_")
@@ -123,6 +158,9 @@ def plot_data(basedir):
                                     title="inactive memory",
                                     using="($0*5):1",
                                     smooth=1)
+            data_stats.write("inactive memory media: %.2f\n" % data.mean())
+            data_stats.write("inactive memory desvio: %.2f\n" % data.std())
+            data_stats.write("inactive memory histograma: %s\n\n" % [histogram(data)])
 
             data = array([float(i['memory']['active']) for i in vmstats.run[1:]],
                          dtype="float_")
@@ -130,10 +168,14 @@ def plot_data(basedir):
                                   title="active memory",
                                   using="($0*5):1",
                                   smooth=1)
+            data_stats.write("active memory media: %.2f\n" % data.mean())
+            data_stats.write("active memory desvio: %.2f\n" % data.std())
+            data_stats.write("active memory histograma: %s\n\n" % [histogram(data)])
 
             g.plot(userdata, sysdata, idledata, iodata)
 
             # Contexts switched and interrupts
+            data_stats.write("Contexts switched and interrupts\n" + "*"*60 + "\n")
             g.title = "Contexts switched and interrupts"
             g.xlabel('time (s)')
             g.ylabel('Interrupts (#/sec)')
@@ -146,15 +188,18 @@ def plot_data(basedir):
                                     title="Interrupts (including clock)",
                                     using="($0*5):1",
                                     smooth=1)
+            data_stats.write("Interrupts media: %.2f\n" % data.mean())
+            data_stats.write("Interrupts desvio: %.2f\n" % data.std())
+            data_stats.write("Interrupts histograma: %s\n\n" % [histogram(data)])
 
             data = array([float(i['nvcswch/s']) for i in pidstats.run[1:]],
                          dtype="float_")
-            print 'media:', data.mean()
-            print 'desvio:', data.std()
-            print 'histograma:', histogram(data)
             contextdata = Gnuplot.Data(data,
                                    title="Context switched",
                                    using="($0*5):1")
+            data_stats.write("Context switched media: %.2f\n" % data.mean())
+            data_stats.write("Context switched desvio: %.2f\n" % data.std())
+            data_stats.write("Context switched histograma: %s\n\n" % [histogram(data)])
 
             g.plot(interruptsdata, contextdata)
 
@@ -162,5 +207,9 @@ def plot_data(basedir):
             g('set output')
             g('reset')
 
+            data_stats.close()
+
+
 if __name__ == "__main__":
     plot_data(sys.argv[1])
+
