@@ -3,6 +3,7 @@
 import sys
 from os import listdir
 import os.path
+from math import ceil, floor
 
 import Gnuplot
 from numpy import array, arange, histogram
@@ -187,22 +188,36 @@ def plot_data(basedir):
             g('reset')
 
             # plot histograms
-            g('set terminal postscript enhanced "Helvetica" 12 color')
+            g('set terminal postscript enhanced "Helvetica" 8 color')
             g("set output '" + os.path.join(subdir, 'histogramas.ps') + "'")
             g('set size 1,1')
             g('set origin 0,0')
-            g('set boxwidth 3')
+            g('set style data histogram')
+            g('set style fill solid border -1')
+#            g('unset xtics')
             g.xlabel('Faixas')
             g.ylabel('Frequencias')
             g('set key off')
             g('set multiplot layout 4,4 scale 1,0.95')
+#            g('set multiplot layout 7,2 scale 1,0.95')
 
             for data in data_stats:
+                g.title(data['title'])
                 hdata = histogram(data['data'])
+
+                g('set yrange [0:30]')
+
+                low = int(floor(hdata[1][0]))
+                high = int(floor(hdata[1][-1])) + 1
+                fill = int(ceil(hdata[1][1] - low))
+                g('set xrange [%d:%d]' % (low, high))
+                g('set boxwidth %f' % fill)
+
                 gdata = Gnuplot.Data(hdata[0],
-                                     title=data['title'],
-                                     using="($0*5):1",
-                                     with_="boxes lw 2",
+#                                     using="($0*5):1",
+                                     using="($0*%f+%f):1" % (float(fill), float(low)),
+#                                     using="($0*%f):1" % (float(fill)),
+                                     with_="boxes",
                                      smooth=1)
                 g.plot(gdata)
             g('set nomultiplot')
