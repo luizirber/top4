@@ -46,15 +46,8 @@ run_all_tests()
   while [ $x != ${#flags[@]} ]
   do
     mkdir -p $OUTPUT_DIR/${dir[$x]}
-    iostat -k -t $REPORT_TIME > $OUTPUT_DIR/${dir[$x]}/ioreport &
-    vmstat -a -n -S k $REPORT_TIME > $OUTPUT_DIR/${dir[$x]}/vmreport &
-    pidstat -w -C stress $REPORT_TIME > $OUTPUT_DIR/${dir[$x]}/pidreport &
-    mpstat -P ALL $REPORT_TIME > $OUTPUT_DIR/${dir[$x]}/mpreport &
-    ./stress ${flags[$x]} --timeout $TIMEOUT > $OUTPUT_DIR/${dir[$x]}/stressreport &&\
-    killall iostat &&\
-    killall vmstat &&\
-    killall pidstat &&\
-    killall mpstat
+    ps2pdf $OUTPUT_DIR/${dir[$x]}/grafico.ps $OUTPUT_DIR/${dir[$x]}/grafico.pdf
+    ps2pdf $OUTPUT_DIR/${dir[$x]}/histogramas.ps $OUTPUT_DIR/${dir[$x]}/histogramas.pdf
     let "x = x + 1"
   done
 }
